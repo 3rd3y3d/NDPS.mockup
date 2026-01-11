@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDPS | Chicago Fintech Infrastructure</title>
+    <style>
+        :root {
+            --navy: #000035;
+            --gold: #D4AF37;
+            --white: #ffffff;
+            --grey: #f8f9fa;
+            --text: #333333;
+            --emerald: #004d40;
+        }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; color: var(--text); background: var(--white); }
+        
+        /* NAVIGATION */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: var(--navy); border-bottom: 3px solid var(--gold); }
+        .logo-container { display: flex; align-items: center; gap: 15px; }
+        .logo-img { height: 60px; width: auto; border-radius: 50%; border: 2px solid var(--gold); }
+        .nav-brand { color: var(--white); font-size: 1.2rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
+        .nav-cta { background: var(--gold); color: var(--navy); padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .nav-cta:hover { background: var(--white); }
+
+        /* HERO SECTION */
+        .hero { background: linear-gradient(135deg, var(--navy) 0%, #001f3f 100%); color: var(--white); padding: 80px 5%; text-align: center; }
+        .hero h1 { font-size: 3rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        .hero p { font-size: 1.2rem; max-width: 700px; margin: 0 auto 40px auto; opacity: 0.9; line-height: 1.6; }
+        .btn-main { background: var(--gold); color: var(--navy); padding: 15px 35px; font-size: 1.1rem; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; text-decoration: none; display: inline-block; }
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4); }
+        .btn-sec { border: 2px solid var(--gold); color: var(--gold); padding: 13px 33px; font-size: 1.1rem; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 15px; text-decoration: none; display: inline-block; }
+        .btn-sec:hover { background: rgba(212, 175, 55, 0.1); }
+
+        /* TRUST BAR */
+        .trust-bar { background: #f0f0f0; padding: 25px 5%; text-align: center; border-bottom: 1px solid #e0e0e0; }
+        .trust-text { font-size: 0.9rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: bold; }
+        .trust-icons { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; font-weight: bold; color: var(--navy); }
+        
+        /* MISSION SECTION */
+        .mission { padding: 80px 5%; max-width: 1000px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
+        .mission-text h2 { color: var(--navy); font-size: 2.2rem; margin-bottom: 20px; }
+        .mission-text p { font-size: 1.1rem; line-height: 1.8; color: #555; margin-bottom: 20px; }
+        .highlight-box { background: var(--grey); padding: 30px; border-left: 5px solid var(--gold); border-radius: 5px; }
+        .comparison-row { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+        .comp-label { font-weight: bold; color: #444; }
+        .comp-bad { color: #c62828; }
+        .comp-good { color: var(--emerald); font-weight: bold; }
+
+        /* SIMULATOR SECTION */
+        .simulator { background: var(--navy); color: var(--white); padding: 80px 5%; text-align: center; }
+        .sim-container { max-width: 600px; margin: auto; background: var(--white); color: var(--text); padding: 40px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .sim-container h3 { margin-top: 0; color: var(--navy); }
+        .input-group { text-align: left; margin-bottom: 20px; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
+        .input-group input { width: 93%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 1.1rem; }
+        .result-display { background: var(--grey); padding: 20px; border-radius: 5px; margin-top: 20px; border: 1px solid #ddd; }
+        .saving-amount { font-size: 2.5rem; color: var(--emerald); font-weight: bold; margin: 10px 0; }
+        
+        /* BIO SECTION */
+        .bio { padding: 80px 5%; background: var(--white); text-align: center; }
+        .bio-content { max-width: 800px; margin: auto; }
+        .bio h2 { color: var(--navy); font-size: 2rem; }
+        .bio p { font-size: 1.1rem; line-height: 1.8; color: #555; }
+        .signature { font-family: 'Courier New', monospace; font-weight: bold; color: var(--navy); margin-top: 20px; font-size: 1.2rem; }
+
+        /* FOOTER */
+        .footer { background: #111; color: #888; padding: 50px 5%; text-align: center; font-size: 0.9rem; }
+        .footer-logo { height: 40px; opacity: 0.5; margin-bottom: 20px; border-radius: 50%; }
+        .qr-placeholder { background: var(--white); width: 100px; height: 100px; margin: 20px auto; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; border-radius: 5px; }
+
+        @media (max-width: 768px) {
+            .mission { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo-container">
+        <img src="NDPS.Logo.jpg" alt="NDPS" class="logo-img">
+        <span class="nav-brand">New Digital Payment Systems</span>
+    </div>
+    <a href="#simulator" class="nav-cta">Audit My Rates</a>
+</nav>
+
+<section class="hero">
+    <h1>UpScaling Chicago’s<br>Financial Infrastructure</h1>
+    <p>Stop paying fees, chargebacks (rent) your 'legacy POS'. Instead, start owning your transaction rails. Local, secure, & instant settlement for
+ Chicago’s premiers independent businesses.</p>
+    <div>
+        <a href="#simulator" class="btn-main">Calculate My Savings</a>
+        <a href="#mission" class="btn-sec">Our Mission</a>
+    </div>
+</section>
+
+<div class="trust-bar">
+    <div class="trust-text">Strategic Advisory For High-Stakes Retail</div>
+    <div class="trust-icons">
+        <span>High-Risk Retail</span> • 
+        <span>Specialty Collectibles</span> • 
+        <span>Food & Beverage</span> • 
+        <span>Fine Jewelry</span>
+    </div>
+</div>
+
+<section id="mission" class="mission">
+    <div class="mission-text">
+        <h2>We Are the Anti-Middleman.</h2>
+        <p>For decades, local merchants have been treated like renters of their own transaction systems. 
+You pay a "tax" on every swipe, carry the risk of fraud, and wait days for the bank to release your funds.</p>
+        <p><strong>NDPS alongside Digital Residuals is changing the rules through latest FinTech.</strong> 
+We don't believe in "one-size-fits-all" rates. A $4 latte and a $4,000 diamond ring should not be processed 
+on the same rail—and we've built the hybrid systems to prove it.</p>
+    </div>
+    <div class="highlight-box">
+        <h3 style="margin-top:0; color:var(--navy);">The Infrastructure Upgrade</h3>
+        
+        <div class="comparison-row">
+            <span class="comp-label">Processing Fees</span>
+            <span class="comp-bad">High (3.5%+)</span>
+        </div>
+        <div class="comparison-row" style="border:none;">
+            <span class="comp-label">NDPS Rail</span>
+            <span class="comp-good">Flat (2.5%)</span>
+        </div>
+        <hr>
+        <div class="comparison-row">
+            <span class="comp-label">Fraud Liability</span>
+            <span class="comp-bad">Merchant Pays</span>
+        </div>
+        <div class="comparison-row" style="border:none;">
+            <span class="comp-label">NDPS Vault</span>
+            <span class="comp-good">Zero Liability</span>
+        </div>
+        <hr>
+        <div class="comparison-row">
+            <span class="comp-label">Settlement Speed</span>
+            <span class="comp-bad">2-3 Business Days</span>
+        </div>
+        <div class="comparison-row" style="border:none;">
+            <span class="comp-label">NDPS Liquidity</span>
+            <span class="comp-good">Instant</span>
+        </div>
+    </div>
+</section>
+
+<section id="simulator" class="simulator">
+    <h2>The $avings Calculator</h2>
+    <p style="margin-bottom:40px; opacity:0.8;">Don't take our word for it. 
+Plug in your monthly numbers to see how much you are currently losing to your MARGINS.</p>
+    
+    <div class="sim-container">
+        <h3>Margin Recovery Audit</h3>
+        
+        <div class="input-group">
+            <label>Monthly Revenue ($)</label>
+            <input type="number" id="monthly_vol" value="25000" oninput="calculate()">
+        </div>
+        
+        <div class="input-group">
+            <label>Current Effective Rate (%)</label>
+            <input type="number" id="current_rate" value="3.5" step="0.1" oninput="calculate()">
+        </div>
+
+        <div class="result-display">
+            <div style="font-size:0.9rem; color:#666; text-transform:uppercase;">Annual Profit Reclaimed</div>
+            <div id="savings" class="saving-amount">$6,000.00</div>
+            <div style="font-size:0.8rem; color:#888;">*Based on NDPS Optimized Rate of 2.5%</div>,
+        </div>
+        <br>
+        <a href="mailto:digipaymentsystems@gmail.com" class="btn-main" style="width:100%; box-sizing:border-box;">Schedule Full Audit</a>
+    </div>
+</section>
+
+<section class="bio">
+    <div class="bio-content">
+        <h2>Leverage more Liquidity with Retail Fintech.</h2>
+        <p>Aside Up$caling your Revenue Infrastructure, 
+as a Digital Content Creator, technology is an interesting
+way to create Art & Music in Chicago.</p>
+
+<p>Also a fellow business owner, I know the unique challenges our local economy faces.  
+Whether Chicago North or South, I very much understand the need to $ave money against 
+co$t$ of ri$ing rent, and the higher co$t$ of resource$ and $upplie$.</p>
+
+<p>We often find way$ to Chip & $have away where we can $ave. 
+Aside providing retail fintech solutions for your commercial venture
+—it's even more SATISFYING & Motivating to help upgrade your 
+business infrastructure, so you KEEP more of every dollar EARNED.</p>
+        <div class="signature">
+            - Kevin Yi, Principal Consultant
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <img src="NDPS.Logo.jpg" alt="NDPS" class="footer-logo">
+    <div>New Digital Payment Systems LLC | Chicago, IL</div>
+    <div>(224) 307-4511</div>
+    
+    <div class="qr-placeholder">
+        [QR CODE]
+    </div>
+    <div style="font-size:0.8rem; opacity:0.5;">Scan to save contact info</div>
+</footer>
+
+<script>
+    function calculate() {
+        // 1. Get Inputs
+        const vol = parseFloat(document.getElementById('monthly_vol').value) || 0;
+        const rate = parseFloat(document.getElementById('current_rate').value) || 0;
+        const target_rate = 2.5; // NDPS Benchmark
+
+        // 2. Calculate Costs
+        const current_cost = vol * (rate / 100);
+        const new_cost = vol * (target_rate / 100);
+        
+        // 3. Calculate Savings
+        const monthly_savings = current_cost - new_cost;
+        const annual_savings = monthly_savings * 12;
+
+        // 4. Update Display
+        document.getElementById('savings').innerText = '$' + annual_savings.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+    // Run on load
+    calculate();
+</script>
+
+</body>
+</html>
