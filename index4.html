@@ -118,8 +118,8 @@
                     <span class="input-val-display" id="disp-rate">3.5%</span>
                 </div>
                 <div class="hybrid-input">
-                    <span style="font-size:0.8rem; color:#888;">Low (2%)</span>
-                    <input type="range" id="rate-range" min="2.0" max="5.0" step="0.1" value="3.5">
+                    <span style="font-size:0.8rem; color:#888;">Low (2.5%)</span>
+                    <input type="range" id="rate-range" min="2.7" max="5.0" step="0.1" value="3.2">
                     <span style="font-size:0.8rem; color:#888;">High (5%)</span>
                 </div>
                 <div style="font-size: 0.8rem; color: #666; margin-top: 5px; font-style: italic;">
@@ -134,13 +134,12 @@
             </div>
 
             <form id="lead-form" action="https://formspree.io/f/maqonago" method="POST" class="capture-form">
-           
-    
-    <input type="hidden" name="Selected_Volume" id="hidden-vol">
-    <input type="hidden" name="Selected_Current_Rate" id="hidden-rate">
-    <input type="hidden" name="Calculated_Annual_Savings" id="hidden-savings">
+                
+                <input type="hidden" name="Selected_Volume" id="hidden-vol">
+                <input type="hidden" name="Selected_Current_Rate" id="hidden-rate">
+                <input type="hidden" name="Calculated_Annual_Savings" id="hidden-savings">
 
-    <div class="form-title">GENERATE OFFICIAL BREAKDOWN</div>
+                <div class="form-title">GENERATE OFFICIAL BREAKDOWN</div>
                 <p style="font-size:0.85rem; color:#666; margin-bottom:15px; text-align:center;">
                     To lock in this 2.7% rate and generate a formal PDF quote, please complete your profile.
                 </p>
@@ -229,9 +228,9 @@
         savingsDisplay.innerText = formattedSavings;
 
         // UPDATE HIDDEN FIELDS FOR EMAIL CAPTURE
-        hiddenVol.value = '$' + vol.toLocaleString();
-        hiddenRate.value = currentRate.toFixed(1) + '%';
-        hiddenSavings.value = formattedSavings;
+        if(hiddenVol) hiddenVol.value = '$' + vol.toLocaleString();
+        if(hiddenRate) hiddenRate.value = currentRate.toFixed(1) + '%';
+        if(hiddenSavings) hiddenSavings.value = formattedSavings;
     }
 
     // --- FORM HANDLING (AJAX to Formspree) ---
@@ -239,6 +238,7 @@
     
     async function handleSubmit(event) {
         event.preventDefault(); // Stop standard redirect
+        console.log("Form submit triggered..."); 
         
         var status = document.getElementById("success-message");
         var btn = document.getElementById("submit-btn");
@@ -295,6 +295,7 @@
 
     // Init
     updateCalc();
+    console.log("NDPS System Ready");
 
 </script>
 
