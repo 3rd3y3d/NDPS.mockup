@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDPS | Master Agent Console</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a; --card: #1e293b; --text: #f1f5f9;
+            --accent: #3b82f6; --gold: #eab308; --danger: #ef4444;
+            --success: #22c55e; --input-bg: #334155;
+        }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+
+        /* --- LAYOUT --- */
+        .container { display: grid; grid-template-columns: 1fr 1fr; height: 100vh; overflow: hidden; }
+        
+        /* Mobile Layout (Pixel Fold Closed) */
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; height: auto; overflow-y: auto; }
+            .control-panel { padding-bottom: 50px; }
+        }
+
+        /* --- LEFT PANEL: CONTROLS --- */
+        .control-panel { padding: 40px; background: rgba(30, 41, 59, 0.5); border-right: 1px solid #334155; overflow-y: auto; }
+        .brand { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        .brand img { height: 40px; border-radius: 50%; border: 2px solid var(--gold); }
+        .badge { background: var(--gold); color: #000; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; letter-spacing: 1px; }
+
+        .section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8; margin-top: 30px; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 5px; }
+
+        /* Inputs */
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.9rem; margin-bottom: 8px; color: #cbd5e1; display: flex; justify-content: space-between; }
+        .input-wrapper { display: flex; align-items: center; gap: 10px; }
+        
+        input[type="number"], select {
+            background: var(--input-bg); border: 1px solid #475569; color: white;
+            padding: 12px; border-radius: 6px; width: 100%; font-size: 1rem; transition: 0.2s;
+        }
+        input[type="number"]:focus, select:focus { outline: none; border-color: var(--accent); }
+        
+        input[type="range"] { flex-grow: 1; accent-color: var(--accent); cursor: pointer; }
+
+        /* --- RIGHT PANEL: DATA VISUALIZATION --- */
+        .viz-panel { padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        
+        .chart-container { width: 100%; max-width: 400px; margin-bottom: 30px; position: relative; }
+        /* Center text in Donut */
+        .donut-inner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .donut-label { font-size: 0.8rem; color: #94a3b8; }
+        .donut-val { font-size: 1.5rem; font-weight: bold; color: var(--gold); }
+
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #334155; text-align: center; }
+        .stat-label { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-val { font-size: 1.8rem; font-weight: bold; margin-top: 5px; }
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+
+        .horizon-metric { margin-top: 30px; width: 100%; background: linear-gradient(90deg, rgba(34,197,94,0.1), transparent); border-left: 4px solid var(--success); padding: 20px; border-radius: 6px; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="control-panel">
+        <div class="brand">
+            <div style="width:40px; height:40px; background:#000; border-radius:50%; border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; font-weight:bold; color:var(--gold);">ND</div>
+            <div>
+                <div style="font-weight:bold; font-size:1.1rem;">NDPS Admin</div>
+                <div class="badge">INTERNAL USE ONLY</div>
+            </div>
+        </div>
+
+        <div class="section-title">Client Profile</div>
+        <div class="input-group">
+            <label>Load Industry Profile</label>
+            <select id="industry" onchange="loadProfile()">
+                <option value="custom">Custom Configuration</option>
+                <option value="retail">General Retail (Standard)</option>
+                <option value="high_ticket">High Ticket / Luxury (Jewelry/Coins)</option>
+                <option value="high_risk">High Risk / Regulated (Vape/Adult)</option>
+                <option value="hospitality">Hospitality (Intl. Cards)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Monthly Volume ($)</label>
+            <div class="input-wrapper">
+                <input type="number" id="volume" value="50000" step="1000" oninput="update()">
+            </div>
+            <input type="range" id="volume-slider" min="10000" max="500000" step="5000" value="50000" oninput="syncVol(this.value)">
+        </div>
+
+        <div class="section-title">Rate Engineering</div>
+        
+        <div class="input-group">
+            <label><span>Client Current Rate (%)</span> <span id="lbl-current" style="color:var(--danger)">3.5%</span></label>
+            <div class="input-wrapper">
+                <input type="range" id="current-rate" min="1.5" max="6.0" step="0.1" value="3.5" oninput="update()">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label><span>NDPS Target Rate (%)</span> <span id="lbl-ndps" style="color:var(--success)">2.2%</span></label>
+            <div class="input-wrapper">
+                <input type="range" id="ndps-rate" min="1.0" max="4.0" step="0.1" value="2.2" oninput="update()">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label><span>Monthly Gateway/Hidden Fees ($)</span></label>
+            <input type="number" id="hidden-fees" value="150" oninput="update()">
+        </div>
+
+    </div>
+
+    <div class="viz-panel">
+        
+        <div class="chart-container">
+            <canvas id="savingsChart"></canvas>
+            <div class="donut-inner">
+                <div class="donut-label">NET SAVINGS</div>
+                <div class="donut-val" id="chart-center-val">$0</div>
+            </div>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-card" style="border-color:var(--danger);">
+                <div class="stat-label">Current Monthly Cost</div>
+                <div class="stat-val text-danger" id="val-current-cost">$0</div>
+                <div style="font-size:0.8rem; opacity:0.6;">Legacy Banking</div>
+            </div>
+            <div class="stat-card" style="border-color:var(--success);">
+                <div class="stat-label">NDPS Monthly Cost</div>
+                <div class="stat-val text-success" id="val-ndps-cost">$0</div>
+                <div style="font-size:0.8rem; opacity:0.6;">Blockchain Rail</div>
+            </div>
+        </div>
+
+        <div class="horizon-metric">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-size:0.9rem; font-weight:bold; color:var(--success);">5-YEAR WEALTH RECOVERY</div>
+                    <div style="font-size:0.8rem; opacity:0.7;">Compounded capital retained by owner</div>
+                </div>
+                <div style="font-size:2rem; font-weight:bold; color:#fff;" id="val-5year">$0</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // --- CHART SETUP ---
+    const ctx = document.getElementById('savingsChart').getContext('2d');
+    const savingsChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Cost (NDPS)', 'Profit Recovered'],
+            datasets: [{
+                data: [50, 50],
+                backgroundColor: ['#1e293b', '#eab308'], // Dark Blue vs Gold
+                borderColor: '#0f172a',
+                borderWidth: 5,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            cutout: '70%',
+            plugins: { legend: { display: false } },
+            responsive: true
+        }
+    });
+
+    // --- LOGIC ---
+    function syncVol(val) {
+        document.getElementById('volume').value = val;
+        update();
+    }
+
+    function loadProfile() {
+        const type = document.getElementById('industry').value;
+        const vol = document.getElementById('volume');
+        const cRate = document.getElementById('current-rate');
+        const nRate = document.getElementById('ndps-rate');
+        const fees = document.getElementById('hidden-fees');
+
+        // PRESETS
+        const profiles = {
+            retail: { v: 40000, c: 3.2, n: 2.4, f: 100 },
+            high_ticket: { v: 120000, c: 3.5, n: 2.1, f: 50 }, // Low hidden fees, high rate
+            high_risk: { v: 60000, c: 4.5, n: 3.0, f: 300 }, // Massive fees
+            hospitality: { v: 250000, c: 3.8, n: 2.5, f: 500 } // Intl Fees
+        };
+
+        if (profiles[type]) {
+            vol.value = profiles[type].v;
+            document.getElementById('volume-slider').value = profiles[type].v;
+            cRate.value = profiles[type].c;
+            nRate.value = profiles[type].n;
+            fees.value = profiles[type].f;
+            update();
+        }
+    }
+
+    function update() {
+        // 1. Gather Inputs
+        const vol = parseFloat(document.getElementById('volume').value) || 0;
+        const currentRate = parseFloat(document.getElementById('current-rate').value);
+        const ndpsRate = parseFloat(document.getElementById('ndps-rate').value);
+        const monthlyFees = parseFloat(document.getElementById('hidden-fees').value) || 0;
+
+        // 2. Update Labels
+        document.getElementById('lbl-current').innerText = currentRate.toFixed(1) + '%';
+        document.getElementById('lbl-ndps').innerText = ndpsRate.toFixed(1) + '%';
+
+        // 3. The Math
+        const currentCost = (vol * (currentRate / 100)) + monthlyFees;
+        // NDPS usually has 0 monthly fees in this pitch, or very low
+        const ndpsCost = (vol * (ndpsRate / 100)); 
+        
+        const monthlySavings = currentCost - ndpsCost;
+        const yearlySavings = monthlySavings * 12;
+        const fiveYearSavings = yearlySavings * 5;
+
+        // 4. Update UI Text
+        document.getElementById('val-current-cost').innerText = fmt(currentCost);
+        document.getElementById('val-ndps-cost').innerText = fmt(ndpsCost);
+        document.getElementById('chart-center-val').innerText = fmt(monthlySavings) + "/mo";
+        document.getElementById('val-5year').innerText = fmt(fiveYearSavings);
+
+        // 5. Update Chart
+        // [NDPS Cost (Base), Savings (Gold)]
+        savingsChart.data.datasets[0].data = [ndpsCost, monthlySavings];
+        savingsChart.update();
+    }
+
+    function fmt(num) {
+        return num.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+    }
+
+    // Init
+    update();
+
+</script>
+</body>
+</html>
